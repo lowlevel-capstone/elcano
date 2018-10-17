@@ -104,7 +104,9 @@ const int Tx0 = 1;      // external output
 // This is the 5V supply produced by the E-bike controller.
 //  If it goes away, 36V power has been turned off (presumably by the rider's key switch).
 //const int EStop =   2;         // external input
-const int WheelClick = 2;      //  was 3; interrupt; Reed switch generates one pulse per rotation.
+
+/*Temporarily changed to test relays*/
+const int WheelClick = 3;      //  was 3; interrupt; Reed switch generates one pulse per rotation.
 
 // D8-13 Connector ----------------------
 // The shield does not provide a socket for D8-13
@@ -248,7 +250,8 @@ class Brakes
   enum brake_state {BR_OFF, BR_HI_VOLTS, BR_LO_VOLTS} state;
   unsigned long clock_hi_ms;
   const int LeftBrakeOnPin = 10;
-  const int RightBrakeOnPin = 4;
+ /*Temporarily changed to test relays*/
+  const int RightBrakeOnPin = 2;
   const int LeftBrakeVoltPin = 8;
   const int RightBrakeVoltPin = 7;
   const unsigned long MaxHi_ms = 800;
