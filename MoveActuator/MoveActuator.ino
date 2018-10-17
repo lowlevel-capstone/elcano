@@ -80,8 +80,8 @@
 #define DAC
 
 /*
-  The Mega is designed to be used with a data-logging shield.
-  The nonMega shield uses A4 and A5 for RTC and D10,11,12,and 13 for MOSI data logging.
+The Mega is designed to be used with a data-logging shield.
+The nonMega shield uses A4 and A5 for RTC and D10,11,12,and 13 for MOSI data logging.
 */
 
 // @ToDo: There are declarations here that are per-trike, and some that are common.
@@ -115,14 +115,14 @@ const int RxD2 = 14;      // reserved external input on X2-19
 const int TxD2 = 15;      // Cruise Drive Command
 const int RxD3 = 16;      // available on X2-22
 const int TxD3 = 17;      // available on X2-20
-/*
-  The Stop signal is a momentary button push from either the console or remote.
-  A rising edge produces an interrupt.
-  The Cruise button works the same way.
-  The ~Estop signal is the 5V supply produced by the motor controller.
-  This supply goes away when either the key switch is turned off or RC4 is pressed.
-  Lack of 5V from the motor controller is an emergency stop.
-  Interrupts are on 2,3,18,19,20 and 21.
+/*  
+The Stop signal is a momentary button push from either the console or remote.
+A rising edge produces an interrupt.
+The Cruise button works the same way.
+The ~Estop signal is the 5V supply produced by the motor controller.
+This supply goes away when either the key switch is turned off or RC4 is pressed.
+Lack of 5V from the motor controller is an emergency stop.
+Interrupts are on 2,3,18,19,20 and 21.
 */
 const int SelectCD     = 49;  // Select IC 3 DAC (channels C and D)
 const int ThrottleMISO = 50;
@@ -134,11 +134,21 @@ const int SelectAB     = 53;  // Select IC 2 DAC (channels A and B)
 // End of IOPCB.h
 /*==========================================================================*/
 
+// When setting up the project, select
+//   Sketch  |  Import Library ... |  SPI
+// include the Serial Periferal Interface (SPI) library:
+#include <SPI.h>
 // The MegaShieldDB has a four channel Digital to Analog Converter (DAC).
 // Basic Arduino cannot write a true analog signal, but only PWM.
 // Many servos take PWM.
 // An electric bicycle (E-bike) throttle expects an analog signal.
 // We have found that feeding a pwm signal to an e-bike controller makes the motor chug at low speed.
+
+#ifndef TRUE
+#define TRUE 1
+#define FALSE 0
+#endif
+
 
 // Values to send over DAC
 const int FullThrottle =  MAX_ACC_OUT;   // 3.63 V
@@ -162,24 +172,24 @@ int ThrottleIncrement = 1;
     Elcano servo has a hardware controller that moves to a
     particular position based on an input PWM signal from Arduino.
     The Arduino PWM signal is a square wave at a base frequency of 490 Hz or 2.04 ms.
-    PWM changes the duty cycle to encode
+    PWM changes the duty cycle to encode   
     0 is always off; 255 always on. One step is 7.92 us.
-
+    
     Elcano servo is fully retracted on a pulse width of 2 ms;
     fully extended at 1 ms and centered at 1.5 ms.
     There is a deadband of 8 us.
     At 12v, servo operating speed is 56mm/s with no load or
     35 mm/s at maximum load.
-
+    
     Output from hardware servo controller to either servo has five wires, with observed bahavior of:
     White: 0V
     Yellow: 5V
     Blue: 0-5V depending on position of servo.
     Black: 12V while servo extends; 0V at rest or retracting.
     Red:   12V while retracting; 0V at rest or extending.
-    The reading on the Blue line has hysteresis when Elcano sends a PWM signal;
+    The reading on the Blue line has hysteresis when Elcano sends a PWM signal; 
     there appear to be different (PWM, position) pairs when retracting or extending.
-    Motor speed is probably controlled by the current on the red or black line.
+    Motor speed is probably controlled by the current on the red or black line.   
 */
 Servo steeringActuator;
 /*---------------------------------------------------------------------------------------*/
