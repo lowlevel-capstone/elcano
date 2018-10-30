@@ -9,81 +9,10 @@
  3) PWM signal for steering.
  ********************************************************************************/
 
-// Input/Output (IO) pin names for the MegaShieldDB printed circuit board (PCB)
- #include "IOPCB.h"
-// Contains trike definitions 
- #include "Settings.h"
 // When setting up the project, select
 //   Sketch  |  Import Library ... |  SPI
 // include the Serial Periferal Interface (SPI) library:
 #include <SPI.h>
-
-/********************************************************************************
-@ToDo: Fix this fix. If there are variant systems, they should be selected
-in Settings.h, and then IO.h can be included *after* that, and test the
-selector, or use values defined in Settings.h.
-Temporary fix 10/7/15:   IOPCB.h is here
-Possibly fixed: 10/8/18
-IOCPB.h section has been commented out and code compiles with the include 
-Settings.h section has also been commented out and code compiles with the include 
-*********************************************************************************/
-
-/********************************************************************************
-// Values (0-255) represent digital values that are PWM signals used by analogWrite.
-
-// MIN and MAX ACC set the minimum signal to get the motor going, and maximum allowable acceleration for the motor
-#define MIN_ACC_OUT 50
-#define MAX_ACC_OUT 235
-
-// RIGHT, STRAIGHT, and LEFT TURN_OUT set values to be sent to the steer actuator that changes the direction of the front wheels
-#define RIGHT_TURN_OUT 229
-#define LEFT_TURN_OUT 127
-#define STRAIGHT_TURN_OUT 178
-
-// RIGHT, STRAIGHT, and LEFT TURN_MS are pulse widths in msec received from the RC controller
-#define RIGHT_TURN_MS 1000
-#define LEFT_TURN_MS 2000
-#define STRAIGHT_TURN_MS 1500
-
-// Turn sensors are believed if they are in this range while wheels are straight
-// These numbers vary considerably, depending on which sensor angle is set to straight.
-#define RIGHT_MIN_COUNT 80
-#define RIGHT_MAX_COUNT 284
-#define LEFT_MIN_COUNT  80
-#define LEFT_MAX_COUNT  284
-
-// Trike specific pins/channels
-// Output to motor actuator
-#define DAC_CHANNEL 0
-// Output to steer actuator
-#define STEER_OUT_PIN 7
-// Output to brake actuator
-//#define BRAKE_OUT_PIN 6
-// DISK_BRAKE is deprecated, use BRAKE_OUT_PIN
-
-// Trike-specific physical parameters
-#define WHEEL_DIAMETER_MM 482
-// Wheel Circumference
-#define WHEEL_CIRCUM_MM (long) (WHEEL_DIAMETER_MM * PI)
-//    Turning radius in cm.
-#define TURN_RADIUS_CM 209
-//    Turning speed in degrees per ms.
-#define TURN_SPEED_DPMS 29700
-//    Smallest change in turning angle, in millidegrees
-#define TURN_RESOLUTION_MDEG 60
-//    Maximum turning angle, in degrees
-#define TURN_MAX_DEG 30
-//  Motor
-#define MOTOR_POLE_PAIRS 23
-// maximum allowed speed
-#define MAX_SPEED_KPH 15
-
-// Use DAC A
-#define THROTTLE_CHANNEL 0
-
-// ====== End Settings.h ======================
-********************************************************************************/
-
 
 // Define the tests to do.
 #define BRAKE_RAMP
@@ -91,69 +20,6 @@ Settings.h section has also been commented out and code compiles with the includ
 #define MOTOR_RAMP
 // If operating with the MegaShieldDB, we can use the Digital Analog Converter to move the vehicle
 #define DAC
-
-/*
-The Mega is designed to be used with a data-logging shield.
-The nonMega shield uses A4 and A5 for RTC and D10,11,12,and 13 for MOSI data logging.
-*/
-/********************************************************************************
-// @ToDo: There are declarations here that are per-trike, and some that are common.
-// Parameters have been added to Settings.h for the per-trike values.
-// Should the common parameters also be defined in Settings.h?
-
-// DIGITAL I/O ----------------------------------------------
-
-// D0-7 Connector -------------------------------
-// On the Mega, any of D0 to D13 can be PWM.
-// D0 is (Rx0) Read Serial Data. 
-const int Rx0 = 0;      // external input
-// [out] Digital Signal 1: (Tx0). Transmit Serial Data.  
-const int Tx0 = 1;      // external output
-
-// This is the 5V supply produced by the E-bike controller.
-//  If it goes away, 36V power has been turned off (presumably by the rider's key switch).
-//const int EStop =   2;         // external input
-const int WheelClick = 2;      //  was 3; interrupt; Reed switch generates one pulse per rotation.
-
-// D8-13 Connector ----------------------
-// The shield does not provide a socket for D8-13
-// D8 is spare on X4-2;  D9 is spare on X5-2.
-// Signals D10-13 are not brought out on connectors, and may be used by a shield.
-const int SDchipSelect = 10;  // for some shields
-const int LED = 13;
-
-// D14 - 21 Connector -------------------------------------
-const int RxD2 = 14;      // reserved external input on X2-19
-// Message in Gamebots format giving wheel spin rate and steering angle.
-const int TxD2 = 15;      // Cruise Drive Command
-const int RxD3 = 16;      // available on X2-22
-const int TxD3 = 17;      // available on X2-20
-/*  
-The Stop signal is a momentary button push from either the console or remote.
-A rising edge produces an interrupt.
-The Cruise button works the same way.
-The ~Estop signal is the 5V supply produced by the motor controller.
-This supply goes away when either the key switch is turned off or RC4 is pressed.
-Lack of 5V from the motor controller is an emergency stop.
-Interrupts are on 2,3,18,19,20 and 21.
-*/
-/********************************************************************************
-const int SelectCD     = 49;  // Select IC 3 DAC (channels C and D)
-const int ThrottleMISO = 50;
-const int ThrottleMOSI = 51;
-const int ThrottleSCK  = 52;
-const int SelectAB     = 53;  // Select IC 2 DAC (channels A and B)
-
-//==========================================================================
-// End of IOPCB.h
-//==========================================================================
-********************************************************************************/
-
-// The MegaShieldDB has a four channel Digital to Analog Converter (DAC).
-// Basic Arduino cannot write a true analog signal, but only PWM.
-// Many servos take PWM.
-// An electric bicycle (E-bike) throttle expects an analog signal.
-// We have found that feeding a pwm signal to an e-bike controller makes the motor chug at low speed.
 
 #ifndef TRUE
 #define TRUE 1
@@ -255,7 +121,8 @@ class Brakes
   enum brake_state {BR_OFF, BR_HI_VOLTS, BR_LO_VOLTS} state;
   unsigned long clock_hi_ms;
   const int LeftBrakeOnPin = 10;
-  const int RightBrakeOnPin = 4;
+ /*Temporarily changed to test relays*/
+  const int RightBrakeOnPin = 2;
   const int LeftBrakeVoltPin = 8;
   const int RightBrakeVoltPin = 7;
   const unsigned long MaxHi_ms = 800;
@@ -502,4 +369,3 @@ void Brakes::Check()
     state = BR_LO_VOLTS;
   }
 }
-
