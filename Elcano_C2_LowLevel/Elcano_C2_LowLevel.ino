@@ -1,5 +1,5 @@
-#include <Settings.h>
-#include <PID_v1.h>
+#include "Settings.h"
+#include "PID_v1.h"  
 #include <SPI.h>
 #include <Servo.h>
 #include <SD.h>
@@ -201,87 +201,9 @@ SerialData TxDataHiLevel,  RxDataHiLevel,  RC_Data;
      *  If there is a change in LED, but no click, the relay does not have enough power.
      */
    
-class Brakes
-{
- public:
-  Brakes();
-  void Stop();
-  void Release();
-  void Check();
- private:
-  enum brake_state {BR_OFF, BR_HI_VOLTS, BR_LO_VOLTS} state;
-  unsigned long clock_hi_ms;
-  const int LeftBrakeOnPin = 10;
-  const int RightBrakeOnPin = 2;
-  const int LeftBrakeVoltPin = 8;
-  const int RightBrakeVoltPin = 7;
-  const unsigned long MaxHi_ms = 800;
- } ;
 
 // For normal operation
-const long int loop_time_ms = 100;  // Limits time in the loop.
-
-Brakes::Brakes()
-{
-  pinMode( LeftBrakeOnPin, OUTPUT);
-  pinMode( RightBrakeOnPin, OUTPUT);
-  pinMode( LeftBrakeVoltPin, OUTPUT);
-  pinMode( RightBrakeVoltPin, OUTPUT);
-  clock_hi_ms = millis();
-  state = BR_OFF;
-}
-void Brakes::Release()
-{
-  /*  Expected behavior:
-   * LEDs go off for relays 2 and 3;
-   * Relay 2 has NO (connected to solenoids) open, and there is no power to solenoids.
-   * Relay 3 connects COM (other end of solenoid) to NO (12V) 
-   */
-  digitalWrite(LeftBrakeOnPin, LOW);
-  digitalWrite(LeftBrakeVoltPin, LOW);
-  digitalWrite(RightBrakeOnPin, LOW);
-  digitalWrite(RightBrakeVoltPin, LOW);
-  state = BR_OFF;
-  if (DEBUG) {
-    Serial.println("Brakes off!");
-  }
-}
-void Brakes::Stop()
-{
-  /*  Expected behavior:
-   *  Both LEDs come on for Relays 2 and 3
-   *  Relay 2 connects NO (solenoids) to COM (ground)
-   *  Relay 3 connects COM (other end of solenoids) to NC (36V)
-   */
-  digitalWrite(LeftBrakeVoltPin, HIGH);  // Need the higher voltage to activate the solenoid.
-  digitalWrite(RightBrakeVoltPin, HIGH); 
-  if (state != BR_HI_VOLTS)
-  {
-    clock_hi_ms = millis();  // keep track of when the higher voltage was applied.
-  }
-  digitalWrite(LeftBrakeOnPin, HIGH); // Activate solenoid to apply brakes.
-  digitalWrite(RightBrakeOnPin, HIGH);
-  state = BR_HI_VOLTS;
-  if (DEBUG) {
-    Serial.println("Brakes on!");
-  }
-}
-void Brakes::Check()
-{
-  /* Expected behavior
-   *  If 36V has been on too long, relay 3 changes LED on to off, switching from 24 to 12V
-   *  If the switch is high, brakes will be released, with both LEDs off.
-   */
- 
-  unsigned long tick = millis();
-  if (state == BR_HI_VOLTS && tick - clock_hi_ms > MaxHi_ms)
-  {  // Have reached maximum time to keep voltage high
-    digitalWrite(LeftBrakeVoltPin, LOW); // Set to lower voltage, which will keep brakes applied
-    digitalWrite(RightBrakeVoltPin, LOW);
-    state = BR_LO_VOLTS;
-  }
-}
-
+ const long int loop_time_ms = 100;  // Limits time in the loop.
  Brakes brake = Brakes();
  
 void setup()
@@ -349,28 +271,22 @@ void setup()
     RC_State.dt  = &RC_Data;
     RC_State.input = &Serial1;
     RC_State.output = &Serial1;  // not used
-    RC_State.capture = MsgType::drive; // match to RadioControl.INO
+    RC_State.capture = MsgType::sensor;
 
   speedCyclometerInput_mmPs = 0;
 
   // Sweep
   pinMode(SWEEP_PIN, INPUT);
   
-  // THIS MUST BE THE LAST LINE IN setup().
-  nextTime = millis();
 }
 
 void loop()
 {  
   // Get the next loop start time. Note this (and the millis() counter) will
   // roll over back to zero after they exceed the 32-bit size of unsigned long,
-  // which happens after about 1.5 months of operation (should check this).
-  // But leave the overflow computation in place, in case we need to go back to
-  // using the micros() counter.
-  // If the new nextTime value is <= LOOP_TIME_MS, we've rolled over.
-  nextTime = nextTime + LOOP_TIME_MS;
-
-  // DO NOT INSERT ANY LOOP CODE ABOVE THIS LINE.
+  // which happens after about 1.5 months of operation 
+  unsigned long timeStart_ms = millis();
+  // INSERT ANY LOOP CODE BELOW THIS POINT !!
 
   static long int desired_speed_cmPs, desired_angle;
   static bool e_stop = 0, auto_mode = 0;
@@ -384,7 +300,7 @@ void loop()
      ParseStateError r = RxStateHiLevel.update();
      if (r == ParseStateError::success) {
        desired_speed_cmPs = RxDataHiLevel.speed_cmPs; 
-       desired_angle = RxDataHiLevel.angle_deg; 
+       desired_angle = RxDataHiLevel.angle_mDeg; 
      } 
    }
     computeSpeed(&history);
@@ -402,7 +318,7 @@ void loop()
       if (!auto_mode)
       {
         desired_speed_cmPs = RC_Data.speed_cmPs; 
-        desired_angle = RC_Data.angle_deg; 
+        desired_angle = RC_Data.angle_mDeg; 
       }
     } 
     if (e_stop)
@@ -415,61 +331,16 @@ void loop()
       SteeringPID(convertHLToTurn(desired_angle));
       ThrottlePID(desired_speed_cmPs);
     }
-  }
-  
-  // DO NOT INSERT ANY LOOP CODE BELOW THIS POINT.
+    
+  // DO NOT INSERT ANY LOOP CODE BELOW THIS POINT !!
 
-  // Figure out how long we need to wait to reach the desired end time
-  // for this loop pass. First, get the actual end time. Note: Beyond this
-  // point, there should be *no* more controller activity -- we want
-  // minimal time between now, when we capture the actual loop end time,
-  // and when we pause til the desired loop end time.
-  endTime = millis();
-  delayTime = 0UL;
-
-  // Did the millis() counter or nextTime overflow and roll over during
-  // this loop pass? Did the loop's processing time overrun the desired
-  // loop period? We have different computations for the delay time in
-  // various cases:
-  if ((nextTime >= endTime) &&
-      (((endTime < LOOP_TIME_MS) && (nextTime < LOOP_TIME_MS)) ||
-       ((endTime >= LOOP_TIME_MS) && (nextTime >= LOOP_TIME_MS)))) {
-    // 1) Neither millis() nor nextTime rolled over --or-- millis() rolled
-    // over *and* nextTime rolled over when we incremented it. For this case,
-    // endTime and nextTime will be in their usual relationship, with
-    // nextTime >= endTime, and both nextTime and endTime are either greater
-    // than the desired loop period, or both are smaller than that.
-    // In this case, we want a delayTime of nextTime - endTime here.
-    delayTime = nextTime - endTime;
-  } else {
-    // (We get here if:
-    // nextTime < endTime -or- exactly one of nextTime or endTime rolled over.
-    // Negate the first if condition and use DeMorgan's laws...
-    // Now pick out the "nextTime rolled over" case. We don't need to test both
-    // nextTime and endTime as we know only one rolled over.)
-    if (nextTime < LOOP_TIME_MS) {
-      // 2) nextTime rolled over when we incremented it, but the millis() timer
-      // hasn't yet rolled over.
-      // In this case, we know we didn't exhaust the loop time, and the time we
-      // need to wait is the remaining time til millis() will roll over, i.e.
-      // from endTime until the max long value, plus the time from zero to
-      // nextTime.
-      delayTime = ULONG_MAX - endTime + nextTime;
-    } else {
-      // (We get here if:
-      // nextTime < endTime -or-
-      // nextTime >= endTime -and- nextTime did not roll over but endTime did.)
-      // What remains are these two cases:
-      // 3) nextTime hasn't rolled over, but millis() has.
-      // In this case, we overran the loop time. Since millis() has rolled over,
-      // we can just use the normal overrun fixup. So combine this with...
-      // 4) Neither nextTime nor millis rolled over, but we overran the desired
-      // loop period.
-      // In this case, we have no delay, but instead extend the allowed time for
-      // this loop pass to the actual time it took.
-      nextTime = endTime;
-      delayTime = 0UL;
-    }
+   unsigned long delay_ms = millis() - (timeStart_ms + LOOP_TIME_MS);
+  // Did we spend long enough in the loop that we should immediately start
+  // the next pass?
+  if(delay_ms > 0L)
+  {
+    // No, pause til the next loop start time.
+    delay(delay_ms);
   }
 }
 
@@ -483,9 +354,7 @@ void testBrakes()
   brake.Stop();
   delay(1000);
   brake.Release();
-  if (DEBUG) {
-    Serial.println(F("Brake test Complete!"));
-  }
+  Serial.println("**** Brake test Complete! ****");
 }
 
 /*-------------------------------------testWheel-------------------------------------------*/
@@ -498,9 +367,7 @@ void testWheel()
   engageWheel(MIN_ACC_OUT); // Min speed (~85 PWM)
   delay(2000);
   engageWheel(0); // Turn off wheel
-  if (DEBUG) {
-    Serial.println(F("Wheel test Complete!"));
-  }
+  Serial.println("**** Wheel test Complete! ****");
 }
 
 /*-------------------------------------testSteering-------------------------------------------*/
@@ -516,9 +383,7 @@ void testSteering()
   delay(6000);
   engageSteering(WHEEL_STRAIGHT_US);
   delay(1000);
-  if (DEBUG) {
-    Serial.println(F("Steering test Complete!"));
-  }
+  Serial.println("**** Steering test Complete! ****");
 }
 /*-------------------------------------engageWheel-------------------------------------------*/
 /*
@@ -543,10 +408,8 @@ void engageWheel(int inputPWM)
   {
     DAC_Write(DAC_CHANNEL, inputPWM); // Pass PWM value and correct channel to DAC_Write 
     currentThrottlePWM = inputPWM;  // Remember most recent throttle PWM value.
-    if (DEBUG) {
-      Serial.print("Wheel engaged = ");
-      Serial.println(currentThrottlePWM);
-    }
+    Serial.print("Wheel engaged = ");
+    Serial.println(currentThrottlePWM);
   }
 }
 
@@ -566,10 +429,8 @@ void engageSteering(int inputMicroseconds)
     STEER_SERVO.writeMicroseconds(inputMicroseconds);
 //    Results.angle_mDeg = inputMicroseconds; // Need to do some kind of backwards conversion to C6
     currentSteeringUS = inputMicroseconds;
-    if (DEBUG) {
-      Serial.print("Steering engaged = ");
-      Serial.println(inputMicroseconds);
-    }
+    Serial.print("Steering engaged = ");
+    Serial.println(inputMicroseconds);
   }
 }
 
@@ -760,32 +621,6 @@ void computeSpeed(struct hist *data)
     }
   }
 }
-
-int convertRCToTurn(int RCturn) {
-  // we convert byte values (0-255) to microseconds (1000-2000)
-  int turn = (RCturn) * (LEFT_TURN_MS - RIGHT_TURN_MS) / 255.0 + RIGHT_TURN_MS;
-  if (DEBUG) {
-    Serial.print("RC turn input: ");
-    Serial.println(RCturn);
-    Serial.print("RC turn us: ");
-    Serial.println(turn);
-  }
-  return turn;
-}
-
-int convertRCToThrottle(int RCthrottle) {
-  // we convert byte values (0-255, with center = 127) to throttle (~50-255)
-  // remember this will return negative throttle values
-  int throttle = (RCthrottle - 127) * 2;
-  if (DEBUG) {
-    Serial.print("RC throttle input: ");
-    Serial.println(RCthrottle);
-    Serial.print("RC throttle: ");
-    Serial.println(throttle);
-  }
-  return throttle;
-}
-
 /*************************** START HIGH LEVEL PROCESSING SECTION ********************************/
 
 /*------------------------------------convertHLToTurn------------------------------------------*/
@@ -815,10 +650,6 @@ void SteeringPID(int desiredValue)
   Serial.print("  PID STEER OUT = ");
   Serial.println(PIDSteeringOutput_us);
   engageSteering((int)PIDSteeringOutput_us);
-  if (DEBUG) {
-    Serial.print("PID STEER OUT = ");
-    Serial.println(PIDSteeringOutput_us);
-  }
 }
 /*------------------------------------ThrottlePID--------------------------------*/
 // Compute PID 
@@ -827,6 +658,10 @@ void SteeringPID(int desiredValue)
 void ThrottlePID(int desiredValue)
 {
   desiredSpeed_mmPs = desiredValue;
+  Serial.print("SPEED MMPS = ");
+  Serial.print(speedCyclometerInput_mmPs);
+  Serial.print(" DESIRED SPEED = ");
+  Serial.print(desiredSpeed_mmPs);
   // Input into PID is PWM and output is PWM
   if(desiredSpeed_mmPs < (speedCyclometerInput_mmPs + 10))
   {
@@ -835,19 +670,11 @@ void ThrottlePID(int desiredValue)
   else
   {
     speedPID.Compute();
+    Serial.print("  PID THROTTLE OUT = ");
+    Serial.println(PIDThrottleOutput_pwm);
     currentThrottlePWM = (int)PIDThrottleOutput_pwm;
     brake.Release();
     engageWheel(currentThrottlePWM);
-    if (DEBUG) {
-      Serial.print("PID THROTTLE OUT = ");
-      Serial.println(PIDThrottleOutput_pwm);
-    }
-  }
-  if (DEBUG) {
-    Serial.print("SPEED MMPS = ");
-    Serial.print(speedCyclometerInput_mmPs);
-    Serial.print(" DESIRED SPEED = ");
-    Serial.println(desiredSpeed_mmPs);
   }
 }
 
