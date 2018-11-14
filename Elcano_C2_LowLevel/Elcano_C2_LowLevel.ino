@@ -1,9 +1,11 @@
-#include <Settings.h>
-#include <PID_v1.h>
+#include "Settings.h"
+#include "PID_v1.h"  
 #include <SPI.h>
 #include <Servo.h>
 #include <SD.h>
-//using namespace elcano;
+#include "ElcanoSerial.h"
+#include "Brakes.h"
+using namespace elcano;
 
 long startTime;
 
@@ -146,8 +148,8 @@ int countz = 0;
 // Sweep communication pin
 const int SWEEP_PIN = 17;
 
-ParseState TxStateHiLevel, RxStateHiLevel, RC_State;
-SerialData TxDataHiLevel,  RxDataHiLevel,  RC_Data;
+ParseState TxStateHiLevel, RxStateHiLevel, RC_State;   // @@@ cant find parseState Library
+SerialData TxDataHiLevel,  RxDataHiLevel,  RC_Data;	   // @@@ cant find SerailData
 /*---------------------------------------------------------------------------------------*/ 
 
 /* Solenoid controlled Brakes.
@@ -189,81 +191,9 @@ SerialData TxDataHiLevel,  RxDataHiLevel,  RC_Data;
      *  If there is a change in LED, but no click, the relay does not have enough power.
      */
    
-class Brakes
-{
- public:
-  Brakes();
-  void Stop();
-  void Release();
-  void Check();
- private:
-  enum brake_state {BR_OFF, BR_HI_VOLTS, BR_LO_VOLTS} state;
-  unsigned long clock_hi_ms;
-  const int LeftBrakeOnPin = 10;
-  const int RightBrakeOnPin = 2;
-  const int LeftBrakeVoltPin = 8;
-  const int RightBrakeVoltPin = 7;
-  const unsigned long MaxHi_ms = 800;
- } ;
 
 // For normal operation
-const long int loop_time_ms = 100;  // Limits time in the loop.
-
-Brakes::Brakes()
-{
-  pinMode( LeftBrakeOnPin, OUTPUT);
-  pinMode( RightBrakeOnPin, OUTPUT);
-  pinMode( LeftBrakeVoltPin, OUTPUT);
-  pinMode( RightBrakeVoltPin, OUTPUT);
-  clock_hi_ms = millis();
-  state = BR_OFF;
-}
-void Brakes::Release()
-{
-  /*  Expected behavior:
-   * LEDs go off for relays 2 and 3;
-   * Relay 2 has NO (connected to solenoids) open, and there is no power to solenoids.
-   * Relay 3 connects COM (other end of solenoid) to NO (12V) 
-   */
-  digitalWrite(LeftBrakeOnPin, LOW);
-  digitalWrite(LeftBrakeVoltPin, LOW);
-  digitalWrite(RightBrakeOnPin, LOW);
-  digitalWrite(RightBrakeVoltPin, LOW);
-  state = BR_OFF;
-}
-void Brakes::Stop()
-{
-  /*  Expected behavior:
-   *  Both LEDs come on for Relays 2 and 3
-   *  Relay 2 connects NO (solenoids) to COM (ground)
-   *  Relay 3 connects COM (other end of solenoids) to NC (36V)
-   */
-  digitalWrite(LeftBrakeVoltPin, HIGH);  // Need the higher voltage to activate the solenoid.
-  digitalWrite(RightBrakeVoltPin, HIGH); 
-  if (state != BR_HI_VOLTS)
-  {
-    clock_hi_ms = millis();  // keep track of when the higher voltage was applied.
-  }
-  digitalWrite(LeftBrakeOnPin, HIGH); // Activate solenoid to apply brakes.
-  digitalWrite(RightBrakeOnPin, HIGH);
-  state = BR_HI_VOLTS;
-}
-void Brakes::Check()
-{
-  /* Expected behavior
-   *  If 36V has been on too long, relay 3 changes LED on to off, switching from 24 to 12V
-   *  If the switch is high, brakes will be released, with both LEDs off.
-   */
- 
-  unsigned long tick = millis();
-  if (state == BR_HI_VOLTS && tick - clock_hi_ms > MaxHi_ms)
-  {  // Have reached maximum time to keep voltage high
-    digitalWrite(LeftBrakeVoltPin, LOW); // Set to lower voltage, which will keep brakes applied
-    digitalWrite(RightBrakeVoltPin, LOW);
-    state = BR_LO_VOLTS;
-  }
-}
-
+ const long int loop_time_ms = 100;  // Limits time in the loop.
  Brakes brake = Brakes();
  
 void setup()
@@ -360,7 +290,7 @@ void loop()
      ParseStateError r = RxStateHiLevel.update();
      if (r == ParseStateError::success) {
        desired_speed_cmPs = RxDataHiLevel.speed_cmPs; 
-       desired_angle = RxDataHiLevel.angle_deg; 
+       desired_angle = RxDataHiLevel.angle_mDeg; 
      } 
    }
     computeSpeed(&history);
@@ -378,7 +308,7 @@ void loop()
       if (!auto_mode)
       {
         desired_speed_cmPs = RC_Data.speed_cmPs; 
-        desired_angle = RC_Data.angle_deg; 
+        desired_angle = RC_Data.angle_mDeg; 
       }
     } 
     if (e_stop)
