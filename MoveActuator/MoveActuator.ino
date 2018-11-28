@@ -1,3 +1,4 @@
+<<<<<<< HEAD
 /********************************************************************************
  Move Actuator: Reduced version of Elcano_C2_Base for testing actuators
  
@@ -17,6 +18,29 @@
 //   Sketch  |  Import Library ... |  SPI
 // include the Serial Periferal Interface (SPI) library:
 #include <SPI.h>
+=======
+/*
+  Move Actuator: Reduced version of Elcano_C2_Base for testing actuators
+
+  Elcano Contol Module C2 Basic: Bare bones low level control of vehicle.
+
+  Outputs are
+  1) Analog 0-4 V signal for traction motor speed
+  2) Four relay signals for brakes.
+  3) PWM signal for steering.
+*/
+
+#include <SPI.h>
+#include <Servo.h>
+
+/*==========================================================================*/
+// @ToDo: Provide a means to select the model of trike rather than hard-coded values
+/*==========================================================================*/
+
+
+#define BRAKE_POWER 9
+#define BRAKE_VOLTAGE 10
+>>>>>>> moveactuator updated to work with known values for Servo.h and the yellow trike
 
 /********************************************************************************
 @ToDo: Fix this fix. If there are variant systems, they should be selected
@@ -30,11 +54,11 @@ Settings.h section has also been commented out and code compiles with the includ
 
 /********************************************************************************
 // Values (0-255) represent digital values that are PWM signals used by analogWrite.
-
 // MIN and MAX ACC set the minimum signal to get the motor going, and maximum allowable acceleration for the motor
 #define MIN_ACC_OUT 50
 #define MAX_ACC_OUT 235
 
+<<<<<<< HEAD
 // RIGHT, STRAIGHT, and LEFT TURN_OUT set values to be sent to the steer actuator that changes the direction of the front wheels
 #define RIGHT_TURN_OUT 229
 #define LEFT_TURN_OUT 127
@@ -44,6 +68,21 @@ Settings.h section has also been commented out and code compiles with the includ
 #define RIGHT_TURN_MS 1000
 #define LEFT_TURN_MS 2000
 #define STRAIGHT_TURN_MS 1500
+=======
+/*
+ * STEERING
+ * RIGHT, STRAIGHT, and LEFT TURN_OUT set values to be sent to the steer actuator that changes the direction of the front wheels
+ * 
+ * 1000 uS maps to Servo.h using a value of 142
+ * 2000 uS maps to Servo.h using a value of 45
+ * 
+ * The yellow trike has a mechanical range of (70-140) and a center at approximately 90
+ */
+#define RIGHT_TURN_OUT 140
+#define LEFT_TURN_OUT 70
+#define STRAIGHT_TURN_OUT 94
+#define STEER_OUT_PIN 8 // Output to steer actuator on this digital pin
+>>>>>>> moveactuator updated to work with known values for Servo.h and the yellow trike
 
 // Turn sensors are believed if they are in this range while wheels are straight
 // These numbers vary considerably, depending on which sensor angle is set to straight.
@@ -55,11 +94,14 @@ Settings.h section has also been commented out and code compiles with the includ
 // Trike specific pins/channels
 // Output to motor actuator
 #define DAC_CHANNEL 0
+<<<<<<< HEAD
 // Output to steer actuator
 #define STEER_OUT_PIN 7
 // Output to brake actuator
 //#define BRAKE_OUT_PIN 6
 // DISK_BRAKE is deprecated, use BRAKE_OUT_PIN
+=======
+>>>>>>> moveactuator updated to work with known values for Servo.h and the yellow trike
 
 // Trike-specific physical parameters
 #define WHEEL_DIAMETER_MM 482
@@ -246,6 +288,7 @@ int ThrottleIncrement = 1;
    
 class Brakes
 {
+<<<<<<< HEAD
  public:
   Brakes();
   void Stop();
@@ -260,6 +303,20 @@ class Brakes
   const int RightBrakeVoltPin = 7;
   const unsigned long MaxHi_ms = 800;
  } ;
+=======
+  public:
+    Brakes();
+    void Stop();
+    void Release();
+    void Check();
+  private:
+    enum brake_state {BR_OFF, BR_HI_VOLTS, BR_LO_VOLTS} state;
+    unsigned long clock_hi_ms;
+    const int brakePower = BRAKE_POWER; // LOW means on, HIGH means off
+    const int brakeOn = BRAKE_VOLTAGE; // LOW means 24v, HIGH means 12v
+    const unsigned long MaxHi_ms = 800;
+} ;
+>>>>>>> moveactuator updated to work with known values for Servo.h and the yellow trike
 
 // For normal operation
 const long int loop_time_ms = 100;  // Limits time in the loop.
