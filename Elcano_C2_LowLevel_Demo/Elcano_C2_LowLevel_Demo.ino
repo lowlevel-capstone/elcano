@@ -42,6 +42,7 @@ void loop() {
   myTrike.update();
 
 
+
 /***********START OF DEMO SECTION**********************************/
   //local vars 
   static long int desired_speed_cmPs, desired_angle;
@@ -69,6 +70,7 @@ void loop() {
   if (section > 15)
 	  exit(1);
   /***********END OF DEMO SECTION**********************************/
+
 
 
 //Timing code
@@ -141,3 +143,4 @@ int ChooseAngle(int section){
   return angle;
   
 }
+

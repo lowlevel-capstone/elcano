@@ -19,5 +19,4 @@ public:
 	void engageSteering(double input);
 	void updateAngle(double input) { steerAngleUS = input; };
 	void setDesiredTurn(int input) { SteeringPID(input); };
-	
 };
