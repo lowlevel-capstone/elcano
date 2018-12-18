@@ -58,6 +58,7 @@ libraries/TimerOne
 *.b#*
 *.s#*
 *.job
+*.pro
 
 # OS generated files #
 ######################
