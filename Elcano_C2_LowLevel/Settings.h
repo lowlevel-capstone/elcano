@@ -1,4 +1,5 @@
 #pragma once
+
 #define TESTING true
 
 
@@ -9,6 +10,7 @@
 
 #endif
 #define DEBUG false
+
 #define RELAYInversion true
 
 /*
