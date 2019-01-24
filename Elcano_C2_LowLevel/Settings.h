@@ -1,6 +1,6 @@
 #pragma once
-#include <Arduino.h>
-
+//#include <Arduino.h>
+#define SerialPrint false
 
 #define RELAYInversion true
 
@@ -93,6 +93,9 @@ Minimum/Maximum and center turning signals
 
 #endif
 
+#ifndef PI
+#define PI 3.14159265359
+#endif
 
 /*
 Vehicle Data
