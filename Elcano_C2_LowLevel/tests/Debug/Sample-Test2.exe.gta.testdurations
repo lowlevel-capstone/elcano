@@ -1,0 +1,37 @@
+<?xml version="1.0" encoding="utf-8"?>
+<GtaTestDurations xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xmlns:xsd="http://www.w3.org/2001/XMLSchema">
+  <Executable>C:\Users\Taylor\Documents\School\Capstone\elcano\Elcano_C2_LowLevel\tests\Debug\Sample-Test2.exe</Executable>
+  <TestDurations>
+    <TestDuration Test="TestCaseName.TestName" Duration="1" />
+    <TestDuration Test="brakes.Constructor" Duration="1" />
+    <TestDuration Test="brakes.initialize" Duration="1" />
+    <TestDuration Test="brakes.release" Duration="1" />
+    <TestDuration Test="brakes.stop" Duration="1" />
+    <TestDuration Test="brakes.Check" Duration="1" />
+    <TestDuration Test="brakeCheck.brakes_0ff" Duration="1" />
+    <TestDuration Test="brakeCheck.brakes_on_lessTime" Duration="1" />
+    <TestDuration Test="brakeCheck.brakes_on_moreTime" Duration="1" />
+    <TestDuration Test="BrakesTest.init" Duration="1" />
+    <TestDuration Test="BrakesTest.release" Duration="1" />
+    <TestDuration Test="BrakesTest.stop" Duration="1" />
+    <TestDuration Test="BrakesTest.check_brakes_0ff" Duration="1" />
+    <TestDuration Test="BrakesTest.check_brakes_on_lessTime" Duration="1" />
+    <TestDuration Test="BrakesTest.check_brakes_on_moreTime" Duration="1" />
+    <TestDuration Test="SteeringControllerTest.init" Duration="1" />
+    <TestDuration Test="SteeringControllerTest.engage_OVER_MAX" Duration="1" />
+    <TestDuration Test="SteeringControllerTest.engage_UNDER_MIN" Duration="1" />
+    <TestDuration Test="SteeringControllerTest.using_Pid" Duration="13" />
+    <TestDuration Test="SteeringControllerTest.using_Pid_1" Duration="2" />
+    <TestDuration Test="SteeringControllerTest.using_Pid_2" Duration="1" />
+    <TestDuration Test="SteeringControllerTest.engage_overflow" Duration="1" />
+    <TestDuration Test="ThrottleControllerTest.init" Duration="1" />
+    <TestDuration Test="ThrottleControllerTest.stop_str100" Duration="1" />
+    <TestDuration Test="ThrottleControllerTest.stop" Duration="1" />
+    <TestDuration Test="ThrottleControllerTest.engage" Duration="1" />
+    <TestDuration Test="ThrottleControllerTest.getSpeed" Duration="1" />
+    <TestDuration Test="ThrottleControllerTest.setSpeed" Duration="1" />
+    <TestDuration Test="ThrottleControllerTest.setdSpeed" Duration="1" />
+    <TestDuration Test="ThrottleControllerTest.update" Duration="1" />
+    <TestDuration Test="ThrottleControllerTest.tick" Duration="1" />
+  </TestDurations>
+</GtaTestDurations>

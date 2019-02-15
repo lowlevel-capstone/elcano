@@ -1,7 +1,9 @@
 #include "Settings.h"
 #include "SteeringController.h"
+#ifndef TESTING
 #include <Arduino.h>
-
+#include "PID_v1.h"
+#endif
 
 SteeringController::SteeringController():
 	steerPID(&steerAngleUS, &PIDSteeringOutput_us, &desiredTurn_us, proportional_steering, integral_steering, derivative_steering, DIRECT)
@@ -30,6 +32,9 @@ void SteeringController::initialize(int32_t input){
 }
 
 void SteeringController::engageSteering(int32_t input) {
+	if (input > 180 || input < 0) {
+		throw std::out_of_range("Invalid angle input");
+	}
 	if (input > MAX_TURN)
 		input = MAX_TURN;
 	else if (input < MIN_TURN)
@@ -44,12 +49,22 @@ void SteeringController::engageSteering(int32_t input) {
 	}
 }
 
+
+void SteeringController::updateAnglePID(int32_t input) { 
+	steerAngleUS = input; 
+	steerPID.Compute();
+	if (PIDSteeringOutput_us != currentSteeringUS) {
+		Steer_Servo.write(PIDSteeringOutput_us);
+		currentSteeringUS = PIDSteeringOutput_us;
+	}
+
+};
 //Private
 void SteeringController::turnOn(int32_t input) {
 	//sets the current angle
 	updateAngle(input);
 	//maps to turn signal
-	input = map(input, MIN_Left_Sensor, MAX_Left_Sensor, MIN_TURN, MAX_TURN);
+	//input = map(input, MIN_Left_Sensor, MAX_Left_Sensor, MIN_TURN, MAX_TURN);
 	//sends the current signal to the servo
 	engageSteering(input);
 	
@@ -65,7 +80,9 @@ void SteeringController::SteeringPID(int32_t input) {
 	desiredTurn_us = input;
 	steerPID.Compute();
 	if (PIDSteeringOutput_us != currentSteeringUS) {
-		Steer_Servo.writeMicroseconds(PIDSteeringOutput_us);
+		Steer_Servo.write(PIDSteeringOutput_us);
 		currentSteeringUS = PIDSteeringOutput_us;
 	}
 }
+
+

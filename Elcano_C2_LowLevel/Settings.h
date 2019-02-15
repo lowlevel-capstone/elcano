@@ -1,14 +1,13 @@
 #pragma once
 
-#define TESTING true
 
 
-#if TESTING==true
-
-#else
-#include <Arduino.h>
-
+#ifndef TESTING
+	#include <Arduino.h>
 #endif
+#define aBoard Mega
+
+
 #define DEBUG false
 
 #define RELAYInversion true

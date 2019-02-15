@@ -65,6 +65,12 @@ void Vehicle::update() {
 	steer.updateAngle(computeAngleLeft());
 	}
 
+void Vehicle::updatePID() {
+	brake.Check();
+	throttle.updateSpeed();
+	steer.updateAnglePID(computeAngleLeft());
+}
+
 int32_t Vehicle::computeAngleLeft() {
 	int32_t val = analogRead(AngleSensorLeft);
 	val = map(val, MIN_Left_Sensor, MAX_Left_Sensor, MIN_TURN, MAX_TURN);

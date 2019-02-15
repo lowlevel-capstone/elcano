@@ -1,5 +1,9 @@
-#include "Settings.h"
+
+#ifndef TESTING
 #include <Arduino.h>
+#endif
+
+#include "Settings.h"
 #include "Brakes.h"
 
 Brakes::Brakes(){

@@ -1,6 +1,8 @@
 #pragma once
+#ifndef TESTING
 #include <Servo.h>
 #include "PID_v1.h"
+#endif
 
 
 class SteeringController{
@@ -18,5 +20,6 @@ public:
 	void initialize(int32_t input);
 	void engageSteering(int32_t input);
 	void updateAngle(int32_t input) { steerAngleUS = input; };
+	void updateAnglePID(int32_t input);
 	void setDesiredTurn(int32_t input) { SteeringPID(input); };
 };
