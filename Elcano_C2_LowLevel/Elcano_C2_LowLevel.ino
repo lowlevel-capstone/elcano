@@ -1,3 +1,4 @@
+
 #include <SPI.h>
 #include "Settings.h"
 #include "Vehicle.h"
@@ -120,3 +121,6 @@ void loop()
 	if (delayTime > 0UL)
 		delay(delayTime);
 }
+
+
+

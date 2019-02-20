@@ -71,6 +71,8 @@ void ThrottleController::engageThrottle(int input) {
 }
 
 
+/*
+*/
 void ThrottleController::updateSpeed() {
 	if (tickTime_ms[1] == 0)
 		speedCyclometerInput_mmPs = 0;
