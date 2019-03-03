@@ -70,6 +70,7 @@ void ThrottleController::engageThrottle(int input) {
 	}
 }
 
+
 /*
 */
 void ThrottleController::updateSpeed() {

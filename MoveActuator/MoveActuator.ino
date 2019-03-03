@@ -1,3 +1,4 @@
+
 /*
   Move Actuator: Reduced version of Elcano_C2_Base for testing actuators
 
@@ -25,6 +26,7 @@
 #define MIN_ACC_OUT 50
 #define MAX_ACC_OUT 235
 
+
 /*
  * STEERING
  * RIGHT, STRAIGHT, and LEFT TURN_OUT set values to be sent to the steer actuator that changes the direction of the front wheels
@@ -39,6 +41,7 @@
 #define STRAIGHT_TURN_OUT 94
 #define STEER_OUT_PIN 8 // Output to steer actuator on this digital pin
 
+
 // Turn sensors are believed if they are in this range while wheels are straight
 // These numbers vary considerably, depending on which sensor angle is set to straight.
 #define RIGHT_MIN_COUNT 80
@@ -49,6 +52,7 @@
 // Trike specific pins/channels
 // Output to motor actuator
 #define DAC_CHANNEL 0
+
 
 // Trike-specific physical parameters
 #define WHEEL_DIAMETER_MM 482
@@ -72,6 +76,7 @@
 
 // ====== End Settings.h ======================
 
+
 // Define the tests to do.
 #define BRAKE_RAMP
 #define STEER_RAMP
@@ -83,7 +88,7 @@
   The Mega is designed to be used with a data-logging shield.
   The nonMega shield uses A4 and A5 for RTC and D10,11,12,and 13 for MOSI data logging.
 */
-
+/********************************************************************************
 // @ToDo: There are declarations here that are per-trike, and some that are common.
 // Parameters have been added to Settings.h for the per-trike values.
 // Should the common parameters also be defined in Settings.h?
@@ -92,9 +97,9 @@
 
 // D0-7 Connector -------------------------------
 // On the Mega, any of D0 to D13 can be PWM.
-/* D0 is (Rx0) Read Serial Data. */
+// D0 is (Rx0) Read Serial Data. 
 const int Rx0 = 0;      // external input
-/* [out] Digital Signal 1: (Tx0). Transmit Serial Data.  */
+// [out] Digital Signal 1: (Tx0). Transmit Serial Data.  
 const int Tx0 = 1;      // external output
 
 // This is the 5V supply produced by the E-bike controller.
@@ -124,15 +129,17 @@ const int TxD3 = 17;      // available on X2-20
   Lack of 5V from the motor controller is an emergency stop.
   Interrupts are on 2,3,18,19,20 and 21.
 */
+/********************************************************************************
 const int SelectCD     = 49;  // Select IC 3 DAC (channels C and D)
 const int ThrottleMISO = 50;
 const int ThrottleMOSI = 51;
 const int ThrottleSCK  = 52;
 const int SelectAB     = 53;  // Select IC 2 DAC (channels A and B)
 
-/*==========================================================================*/
+//==========================================================================
 // End of IOPCB.h
-/*==========================================================================*/
+//==========================================================================
+********************************************************************************/
 
 // The MegaShieldDB has a four channel Digital to Analog Converter (DAC).
 // Basic Arduino cannot write a true analog signal, but only PWM.
@@ -241,6 +248,7 @@ class Brakes
 
 // For normal operation
 const long int loop_time_ms = 100;  // Limits time in the loop.
+
 
 Brakes brake = Brakes();
 
@@ -470,3 +478,4 @@ void Brakes::Check() {
     state = BR_LO_VOLTS;
   }
 }
+
