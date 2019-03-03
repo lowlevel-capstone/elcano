@@ -40,13 +40,14 @@ libraries/TimerOne
 *.pch
 # Visual Studio Files
 ########################
-*.vcxproj.*
+*.vcxproj
 *_vm/
 *.user
 *.filters
 *.vs
 *.pdb
 *.idb
+*.sln
 
 # Packages #
 ############
