@@ -36,13 +36,17 @@ libraries/TimerOne
 *.so
 *.pyc
 *.gch
-
+*.obj
+*.pch
 # Visual Studio Files
 ########################
-*.vcxproj
+*.vcxproj.*
 *_vm/
 *.user
 *.filters
+*.vs
+*.pdb
+*.idb
 
 # Packages #
 ############
