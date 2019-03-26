@@ -11,38 +11,35 @@
 
 #include <SPI.h>
 #include <Servo.h>
-//#include <Settings.h>
 
-// Input/Output (IO) pin names for the MegaShieldDB printed circuit board (PCB)
-// #include <IOPCB.h>
 /*==========================================================================*/
-// @ToDo: Fix this fix. If there are variant systems, they should be selected
-// in Settings.h, and then IO.h can be included *after* that, and test the
-// selector, or use values defined in Settings.h.
-// Temporary fix 10/7/15:   IOPCB.h is here
+// @ToDo: Provide a means to select the model of trike rather than hard-coded values
 /*==========================================================================*/
-/* IO_PCB.h:  I/O pin assignments for Arduino Mega 2560 on MegaShieldDB
-*/
 
 
+#define BRAKE_POWER 9
+#define BRAKE_VOLTAGE 10
 
 // Values (0-255) represent digital values that are PWM signals used by analogWrite.
-
 // MIN and MAX ACC set the minimum signal to get the motor going, and maximum allowable acceleration for the motor
 #define MIN_ACC_OUT 50
 #define MAX_ACC_OUT 235
 
-// RIGHT, STRAIGHT, and LEFT TURN_OUT set values to be sent to the steer actuator that changes the direction of the front wheels
-// 1000 uS maps to Servo.h using a value of 142
-// 2000 uS maps to Servo.h using a value of 45
-#define RIGHT_TURN_OUT 65
-#define LEFT_TURN_OUT 45 
-#define STRAIGHT_TURN_OUT 55
 
-// RIGHT, STRAIGHT, and LEFT TURN_MS are pulse widths in msec received from the RC controller
-#define RIGHT_TURN_MS 1000
-#define LEFT_TURN_MS 2000
-#define STRAIGHT_TURN_MS 1500
+/*
+ * STEERING
+ * RIGHT, STRAIGHT, and LEFT TURN_OUT set values to be sent to the steer actuator that changes the direction of the front wheels
+ * 
+ * 1000 uS maps to Servo.h using a value of 142
+ * 2000 uS maps to Servo.h using a value of 45
+ * 
+ * The yellow trike has a mechanical range of (70-140) and a center at approximately 90
+ */
+#define RIGHT_TURN_OUT 140
+#define LEFT_TURN_OUT 70
+#define STRAIGHT_TURN_OUT 94
+#define STEER_OUT_PIN 8 // Output to steer actuator on this digital pin
+
 
 // Turn sensors are believed if they are in this range while wheels are straight
 // These numbers vary considerably, depending on which sensor angle is set to straight.
@@ -54,8 +51,6 @@
 // Trike specific pins/channels
 // Output to motor actuator
 #define DAC_CHANNEL 0
-// Output to steer actuator
-#define STEER_OUT_PIN 8
 
 
 // Trike-specific physical parameters
@@ -80,10 +75,11 @@
 
 // ====== End Settings.h ======================
 
+
 // Define the tests to do.
 #define BRAKE_RAMP
 #define STEER_RAMP
-//#define MOTOR_RAMP
+#define MOTOR_RAMP
 // If operating with the MegaShieldDB, we can use the Digital Analog Converter to move the vehicle
 #define DAC
 
@@ -91,7 +87,7 @@
   The Mega is designed to be used with a data-logging shield.
   The nonMega shield uses A4 and A5 for RTC and D10,11,12,and 13 for MOSI data logging.
 */
-
+/********************************************************************************
 // @ToDo: There are declarations here that are per-trike, and some that are common.
 // Parameters have been added to Settings.h for the per-trike values.
 // Should the common parameters also be defined in Settings.h?
@@ -100,9 +96,9 @@
 
 // D0-7 Connector -------------------------------
 // On the Mega, any of D0 to D13 can be PWM.
-/* D0 is (Rx0) Read Serial Data. */
+// D0 is (Rx0) Read Serial Data. 
 const int Rx0 = 0;      // external input
-/* [out] Digital Signal 1: (Tx0). Transmit Serial Data.  */
+// [out] Digital Signal 1: (Tx0). Transmit Serial Data.  
 const int Tx0 = 1;      // external output
 
 // This is the 5V supply produced by the E-bike controller.
@@ -132,15 +128,17 @@ const int TxD3 = 17;      // available on X2-20
   Lack of 5V from the motor controller is an emergency stop.
   Interrupts are on 2,3,18,19,20 and 21.
 */
+/********************************************************************************
 const int SelectCD     = 49;  // Select IC 3 DAC (channels C and D)
 const int ThrottleMISO = 50;
 const int ThrottleMOSI = 51;
 const int ThrottleSCK  = 52;
 const int SelectAB     = 53;  // Select IC 2 DAC (channels A and B)
 
-/*==========================================================================*/
+//==========================================================================
 // End of IOPCB.h
-/*==========================================================================*/
+//==========================================================================
+********************************************************************************/
 
 // The MegaShieldDB has a four channel Digital to Analog Converter (DAC).
 // Basic Arduino cannot write a true analog signal, but only PWM.
@@ -242,13 +240,14 @@ class Brakes
   private:
     enum brake_state {BR_OFF, BR_HI_VOLTS, BR_LO_VOLTS} state;
     unsigned long clock_hi_ms;
-    const int brakePower = 9; // LOW means on, HIGH means off
-    const int brakeOn = 10; // LOW means 24v, HIGH means 12v
+    const int brakePower = BRAKE_POWER; // LOW means on, HIGH means off
+    const int brakeOn = BRAKE_VOLTAGE; // LOW means 24v, HIGH means 12v
     const unsigned long MaxHi_ms = 800;
 } ;
 
 // For normal operation
 const long int loop_time_ms = 100;  // Limits time in the loop.
+
 
 Brakes brake = Brakes();
 

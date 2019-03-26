@@ -1,0 +1,268 @@
+pick 247e5cb The loop timing code is buggy. It uses an unsigned variable for a signed quantity that is almost certainly negative. Observed symptom was that the loop went through one pass then hung. That is consistent with a very very very large delay time, when the negative number is interpreted as a very very very large positive number. Two takeaways: First, do not use unsigned unless you are entirely certain you have positive quantities.  Presence of a subtraction should be a warning flag. Walk through code paths with all cases. Second, test your work before pushing it into the main repository. Due to time constraints, I am putting back the last working loop code, which is the rollover protection code. We can have a debate about whether this should be kept at some later date. Right now, we need to have the loop working. Also, it appears the include of ElcanoSerial.h was removed at some point. That is necessary -- the file won't even compile without it -- so I've put it back.
+pick 39ddbab Use 0UL for consistency with variable types.
+pick b799571 resynch other files with master branch.
+pick 46f4fdf Adding support for Spektrum ESTOP signal; the Spektrum receiver is not currently working so this has not yet been tested live.
+pick c075b48 removing extra nested RC folder
+pick 30abac3 This change adds the number field to a drive packet, otherwise this is ommitted from the packet even if the field is set.
+pick 31c1cc3 C2-LL changes: - Added a "DEBUG" variable and put most serial monitor output statements in a debugging conditional. - changed include statements; elcanoserial.h and settings.h are not default directory header files and need quotes RC changes: need init on ESerial UART, changed how analog throttle and turn values are handled to make sure throttle and turn are always in the range of 0-255 when passed to C2
+pick 381f8a8 Added a debugging conditional. Added debugging messages in place of unconditional serial printouts. Integrated functions to convert RC values to LL values
+pick 2340815 changed quotes to angle brackets in C2 includes
+pick 3ab2c1e Do floating point division in conversion from byte turn values to servo us.
+pick a2dc687 Deleted obsolete documentation
+pick 7a8c7b4 Adding SCH and BRD files for RC Transmitter unit. This board is designed for an arduino micro, two joysticks, indicator LEDs, (power, estop, and auto) switches, and a 3-pin ASK radio.
+
+
+pick 9253de8 Current
+
+pick f5490d6 Update Elcano_C2_LowLevel.ino
+fixup 3051c8c Update Elcano_C2_LowLevel.ino
+
+pick e81178b Removed/ Added to correct folder
+fixup 68fddd0 Removed/ Added to correct folder
+
+pick 6f41d48 noted differences between current code and JBreithaupts
+fixup 03de740 noted differences between current code and JBreithaupts
+
+pick 1d56516 Commented out header files
+fixup 86e3b8f Commented out header files
+
+pick f1c3ebb prevent pushing settings.h files
+fixup 164ac64 prevent pushing settings.h files
+
+pick 76cc9d2 Move the Brakes class out
+fixup 5e67993 Move the Brakes class out
+
+pick da4ef77 Initial commit of LLv3 snapshot
+fixup 43a4f91 Initial commit of LLv3 snapshot
+
+pick eeaaced electronics update!
+fixup a65116a electronics update!
+
+pick 423cef0 added PWM output on steering header and 120ohm terminating resistor for CAN
+fixup ca2a9d5 added PWM output on steering header and 120ohm terminating resistor for CAN
+
+pick 60efd74 added Eagle temp file types to gitignore
+fixup 5ae6cc1 added Eagle temp file types to gitignore
+
+pick cb6dda5 removed accidental debugging Mega, added a handful of vias to fix GND orphans
+fixup 79df320 removed accidental debugging Mega, added a handful of vias to fix GND orphans
+
+pick 0b681f9 schematic cleanup
+fixup ee8896c schematic cleanup
+
+
+pick b753359 organized into class structures
+fixup 1a4394d organized into class structures
+
+fixup 7edb400 Forgot to save
+fixup bd4cabd Forgot to save
+
+pick fb9357e minor changes to vehicle and lowlevel
+fixup 14641ea minor changes to vehicle and lowlevel
+
+pick 2271e12 fixed silkscreen in old v2
+fixup d4188a3 fixed silkscreen in old v2
+
+pick ee09924 rearranged silkscreen for clarity in v3
+fixup acf9db8 rearranged silkscreen for clarity in v3
+
+pick c3d368b Added reset button to top of board
+fixup d3d2a36 Added reset button to top of board
+
+pick 85374d3 moveactuator updated to work with known values for Servo.h and the yellow trike
+fixup a07b851 moveactuator updated to work with known values for Servo.h and the yellow trike
+
+pick 4bb10aa started updateSpeed in ThrottleController
+fixup 368f90c started updateSpeed in ThrottleController
+
+pick e872aa8 finished refactor
+fixup 3535362 finished refactor
+
+pick 6b73eae removed old version
+fixup 99d8fdc removed old version
+
+pick 0b320ab removed files from top level files
+fixup f866d86 removed files from top level files
+
+pick 78367c1 added figure8 script
+fixup 28e7005 added figure8 script
+
+pick a872c1e Added three simple function-test sketches
+fixup f0f8d0c Added three simple function-test sketches
+
+pick afa245d added "secret mode" to the servo test sketch
+fixup 3898ab7 added "secret mode" to the servo test sketch
+
+pick db68eb7 Bugs fixed
+fixup 2734e5d Bugs fixed
+
+pick 6899777 eagle project file meta update
+fixup 90716fa eagle project file meta update
+
+pick 3e5ee0f moved demo test into a folder
+fixup d806346 moved demo test into a folder
+
+pick 45297a0 fixed spelling error in folder name
+fixup 9070099 fixed spelling error in folder name
+
+pick 1a19b43 fixed spelling
+fixup 8a3abe7 fixed spelling
+
+pick 86139cf changed serial.prints, added beginTransaction and endTransaction for SPI
+fixup 59eccff changed serial.prints, added beginTransaction and endTransaction for SPI
+
+pick f859b8d Fixed dac error
+fixup 74694a9 Fixed dac error
+
+pick f6497e7 Many LLBv3 updates in one!
+fixup a8d9159 Many LLBv3 updates in one!
+
+pick bab0c48 LLBv3 updates
+fixup e62de49 LLBv3 updates
+
+pick b1bc130 fixed bad late night code
+fixup c49b502 fixed bad late night code
+
+pick 5a7da29 Added e-stop, routed additional connetions to DB15, changed board layout
+fixup 76b0922 Added e-stop, routed additional connetions to DB15, changed board layout
+
+pick bfd85f4 partial routing, adding restrict polys
+fixup be611ab partial routing, adding restrict polys
+
+pick 50d74be LLBv3 routing overhaul
+fixup b138f20 LLBv3 routing overhaul
+
+pick 0aa39e7 added dimensions to board
+fixup f48f871 added dimensions to board
+
+pick a1871fc re-routed watchdog from digi-5 to DB15 thru middle instead of along edge
+fixup cc6981c re-routed watchdog from digi-5 to DB15 thru middle instead of along edge
+
+pick b43677c added .pro to git ignore
+fixup 3e05cab added .pro to git ignore
+
+pick da64ffd Added pin mapping xlsx document for LLBv3
+fixup 54f5ffb Added pin mapping xlsx document for LLBv3
+
+pick 7ea8461 updated LLBv3 pin mapping document; matches current state of board
+fixup 4e17c35 updated LLBv3 pin mapping document; matches current state of board
+
+pick 82c5d4c Updates to board, schematic, library
+fixup 74bc7ed Updates to board, schematic, library
+
+pick 6fa8b56 corrected PCINT pin mapping
+fixup 96c9ca0 corrected PCINT pin mapping
+
+pick 96ffb7c board cleanup, via removal, silkscreen tidying
+fixup 791d401 board cleanup, via removal, silkscreen tidying
+
+pick 726d10f lots of renaming and slight position changes
+fixup 5ff25fc lots of renaming and slight position changes
+
+pick 32bcd20 added hardware parts designed last quarter
+fixup 7fd40a1 added hardware parts designed last quarter
+
+pick bf990d6 Update Brakes class
+fixup 66b2039 Update Brakes.cpp
+
+squash f05204f Update Brakes.h
+fixup 6485f40 Update Brakes.h
+
+pick 090f4d1 Update Settings.h
+fixup 989372f Update Settings.h
+
+pick 9c8c70c updated based on demo code
+fixup 21a6618 updated based on demo code
+
+pick 32fecf8 fixed ino code
+fixup 36291e0 fixed ino code
+
+pick 001f189 Delete Figure8.ino
+fixup 88f72b2 Delete Figure8.ino
+
+pick f5b6b53 Delete Settings_old.h
+fixup 0b58640 Delete Settings_old.h
+
+pick f7c55bc Delete pin_settings.h
+fixup 8785a30 Delete pin_settings.h
+
+pick b7a8f60 Delete trike_settings.h
+fixup 682ac79 Delete trike_settings.h
+
+pick 1fb93d6 Made recommended changes
+fixup 1462b0f Made recommended changes
+
+pick e9d7239 interrupts contained in appropriate class
+fixup 6102581 interrupts contained in appropriate class
+
+# pick ef984e0aa63eff83c28899cee86d0d5efa1006dc Cleaned up move actuator
+pick e5e7ef5 Changed pin number for relays
+
+pick 3ae89be update MoveActuator by using Serial.h
+
+pick 9769485 Checkpoint for first PCB order
+pick c21324c swapped 0.2uF for 0.1uF, updated BoM
+pick 2f91066 added screw terminal to BoM
+pick cc6a7fd Added URL for click-jack to BoM
+pick e3044f1 first foray into sorting the electronics folder and filtering out obselete designs
+pick f922de9 expanded copper for relay module, moved drills for odometer away from board edge
+pick 3db8e69 Initial commit of LLBv3 function tests
+pick 5be1f83 LLBv3 corrections
+pick bf2111c LLBv3 function test program update
+pick b38ed51 also corrected pinout definition
+pick 01d47ba add CAN bus command
+pick b599d4e Created initial version of a 'settings.h' file for the LLBv3.
+pick 855f3c6 Added RJ45 modular jack to Elcanoparts library
+pick 81ec774 LLBv3.1 changes
+pick 89df3ae Corrections to silkscreen, added testpoints
+pick f90936e Removed DACB from the DB15 connector. Pin 13 will now be used by the manual throttle as a 5V source.
+pick c9df3f5 Minor update to high current traces to increase surface area
+pick c2bc1c2 Restored DACB to the DB15, but now on pin 15. Removed watchdog from DB15.
+pick c518b48 Added document to describe the steering header pin mapping on a CAT5E
+pick 87e4f5b Update CAN message command
+pick be602b7 Low level with CAN receive
+pick 0d95048 Rename lowLevel.ino to Elcano_C2_LowLevel/lowLevel.ino
+pick 10c108a added can messaging
+pick e3c91f5 Added tests for LLBv3.1, now capable of testing the cyclometer
+pick 3a9083c removed extra lowlevel code
+pick 3d590e3 moved llbv3 settings
+pick 7f41142 combined settings files
+pick 8573908 added some interrupt handlers, simplified classes
+pick c732c29 integrated CAN
+pick 6317a1e Minorsilkscreen updates
+pick 3c44f6d Defined odo click for function test
+pick 87c55a0 Updated llbv3 bill of materials
+pick ea6ca2f Coerced firmware to compile
+pick a516614 Cleanup
+pick d04fd58 fixed classes for can interrupts, made instances static
+pick 9b58588 started working on angle translation, partially written function is never called and is work in progress with many comments
+pick 65f8481 bug fix
+pick 5bf8c9c investigating bugs
+pick eadd30c fixing bugs
+pick f3b32d3 added steer tester
+pick 45da2f1 Corrected pin mapping document for steering PWM pin
+pick 7a21401 fixed steering
+pick 506f4af Removed extra
+pick 63c06de Add CAN and high level test
+pick efdba20 Add start celibrate
+pick 5b71808 Add more high level comments and tests
+pick 0ccfbd8 added vs files to gitignore
+
+# Rebase 1f3aa91..0ccfbd8 onto 1f3aa91 (182 commands)
+#
+# Commands:
+# p, pick = use commit
+# r, reword = use commit, but edit the commit message
+# e, edit = use commit, but stop for amending
+# s, squash = use commit, but meld into previous commit
+# f, fixup = like "squash", but discard this commit's log message
+# x, exec = run command (the rest of the line) using shell
+# d, drop = remove commit
+#
+# These lines can be re-ordered; they are executed from top to bottom.
+#
+# If you remove a line here THAT COMMIT WILL BE LOST.
+#
+# However, if you remove everything, the rebase will be aborted.
+#
+# Note that empty commits are commented out

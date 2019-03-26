@@ -42,6 +42,7 @@ void loop() {
   myTrike.update();
 
 
+
 /***********START OF DEMO SECTION**********************************/
   //local vars 
   static long int desired_speed_cmPs, desired_angle;
